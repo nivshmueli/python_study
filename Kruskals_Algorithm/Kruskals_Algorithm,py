@@ -1,0 +1,64 @@
+
+
+def kruskals_algorithm(list_of_points):
+
+    #creatye list of all edges wirth thier wights
+    edges = []
+    for i in range(len(list_of_points)):
+        for j in range(i + 1, len(list_of_points)):
+            # Calculate the distance between the two points (assuming Manhattan distance)
+            weight = (abs(list_of_points[i][0] - list_of_points[j][0]) +
+                      abs(list_of_points[i][1] - list_of_points[j][1]))
+            edges.append((weight, i, j))
+
+    #Sort all edges from cheapest to most expensive.
+    edges.sort()
+
+    connected_cluster = []
+    span_tree_weight = 0
+    span_tree_edges = []
+
+    def is_point_connected(point1, point2):
+
+        set1_ind = -1
+        set2_ind = -1
+        for i, cluster in enumerate(connected_cluster):
+            if point1 in cluster and point2 in cluster:
+                return set1_ind, set2_ind
+            elif point1 in cluster:
+                set1_ind = i
+            elif point2 in cluster:
+                set2_ind = i
+                
+        return set1_ind, set2_ind
+
+    for e in edges:
+        # try to add the next cheapest edge to the tree
+        # check or its two point if belong to already existed cluster and return the cluster index  
+        # if point did not found in any cluster return -1 
+        set1_ind, set2_ind = is_point_connected(e[1],e[2])
+  
+        if set1_ind == -1 or set2_ind == -1:
+             #if both points are not already on any set we need to create new set for both of them
+             connected_cluster.append({e[1], e[2]})
+        elif set1_ind == set2_ind:             
+            # if e[1] and e[2] are already in the same cluster, skip this edge to avoid creating a cycle
+            continue
+        elif set1_ind >= 0 and set2_ind == -1:
+            # if e[1] is already in a cluster and e[2] is not, add e[2] to the cluster of e[1]
+            connected_cluster[set1_ind].add(e[2])
+        elif set2_ind >= 0 and set1_ind == -1:
+             # if e[2] is already in a cluster and e[1] is not, add e[1] to the cluster of e[2]
+            connected_cluster[set2_ind].add(e[1])
+        else:
+             # if e[1] and e[2] are in different clusters, merge the two clusters 
+            connected_cluster[set1_ind].update(connected_cluster[set2_ind])
+            connected_cluster.pop(set2_ind)
+
+
+        span_tree_weight += e[0]  
+        span_tree_edges.append(e)
+
+        if len(connected_cluster) == 1 and len(connected_cluster[0]) == len(list_of_points):
+            # if all points are in the same cluster, we have a spanning tree
+            return span_tree_weight, span_tree_edges
