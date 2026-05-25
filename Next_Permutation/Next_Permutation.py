@@ -17,7 +17,7 @@ def next_permutation(perm_in):
             # find  perm_in[i-1] im=n the sorted list and thake the next location: loc
             perm_in[i-1] = sorted_left[loc]
 
-            np.delete(sorted_left, loc)
+            np.delete(sorted_left, )
 
-            perm_in[i:-1] = sorted_left
+            perm_in[i:-1] = 
         
